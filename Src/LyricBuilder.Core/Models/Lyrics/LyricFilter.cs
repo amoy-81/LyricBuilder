@@ -1,0 +1,14 @@
+namespace LyricBuilder.Core.Models.Lyrics;
+
+/// <summary>
+/// Query-string filter for the lyric list endpoint.
+/// </summary>
+public class LyricFilter : WithPagination
+{
+    public LyricStatus? Status { get; set; }
+    public string? Genre { get; set; }
+    public string? Language { get; set; }
+
+    /// <summary>Case-insensitive match against the title.</summary>
+    public string? Search { get; set; }
+}

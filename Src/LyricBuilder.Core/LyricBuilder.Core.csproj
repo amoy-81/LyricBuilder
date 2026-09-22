@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\LyricBuilder.Abstractions\LyricBuilder.Abstractions.csproj" />
+        <ProjectReference Include="..\LyricBuilder.Domain\LyricBuilder.Domain.csproj" />
+        <ProjectReference Include="..\LyricBuilder.Infrastructure\LyricBuilder.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>
