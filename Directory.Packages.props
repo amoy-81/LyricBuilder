@@ -1,0 +1,40 @@
+<Project>
+
+    <PropertyGroup>
+        <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+    </PropertyGroup>
+
+    <!-- One version per package for the whole solution. Keeping EF Core and the Npgsql
+         provider in lockstep here avoids the NU1605 downgrade errors that come from pinning
+         the same package at different versions in individual projects. -->
+    <ItemGroup Label="EF Core / PostgreSQL">
+        <PackageVersion Include="Microsoft.EntityFrameworkCore" Version="10.0.4" />
+        <PackageVersion Include="Microsoft.EntityFrameworkCore.Relational" Version="10.0.4" />
+        <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.4" />
+        <PackageVersion Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+    </ItemGroup>
+
+    <ItemGroup Label="Extensions">
+        <PackageVersion Include="Microsoft.Extensions.Configuration.Abstractions" Version="10.0.4" />
+        <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.4" />
+        <PackageVersion Include="Microsoft.Extensions.Hosting.Abstractions" Version="10.0.0" />
+        <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.0" />
+    </ItemGroup>
+
+    <ItemGroup Label="Web / API">
+        <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
+        <!-- Microsoft.AspNetCore.OpenApi pulls in Microsoft.OpenApi 2.0.0, which has a known
+             high-severity advisory. Pinned forward within the same major so the document and
+             schema transformer APIs stay source-compatible. -->
+        <PackageVersion Include="Microsoft.OpenApi" Version="2.12.2" />
+        <PackageVersion Include="Scalar.AspNetCore" Version="2.10.0" />
+    </ItemGroup>
+
+    <ItemGroup Label="Logging">
+        <PackageVersion Include="Serilog" Version="4.2.0" />
+        <PackageVersion Include="Serilog.AspNetCore" Version="9.0.0" />
+        <PackageVersion Include="Serilog.Settings.Configuration" Version="9.0.0" />
+        <PackageVersion Include="Serilog.Sinks.Console" Version="6.0.0" />
+    </ItemGroup>
+
+</Project>
