@@ -28,10 +28,12 @@ be swapped without touching a service.
 
 ### Domain
 
-Entities and enums. `BaseEntity`, `Lyric`, `LyricStatus`.
+Entities and enums: `Lyric` and its `LyricSection`s, `Style`, `Tag`. See
+[Domain model](domain-model.md) for how they fit together.
 
-Currently anemic — data with no behaviour. That is a deliberate starting point, not a target.
-As business rules appear, they belong on the entity, not spread across services.
+Mostly plain data. Where a real rule exists it lives on the entity, not in a service: section
+order is kept contiguous by `Lyric`'s own methods, which is why `Position` has no public
+setter. New rules of that kind belong there too.
 
 ### Infrastructure
 
@@ -93,6 +95,7 @@ always hold a single file.
 
 ## Further reading
 
+- [Domain model](domain-model.md) — lyrics, sections, styles, and what generation reads
 - [Result pattern](result-pattern.md) — how failures travel
 - [Models and DTOs](models-and-dtos.md) — why entities stop at the service boundary
 - [Persistence](persistence.md) — repository, auditing, the UTC rule

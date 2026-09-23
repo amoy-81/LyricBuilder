@@ -51,7 +51,7 @@ becomes writable.
 
 ### 3. It couples the API contract to the schema
 
-Rename a column or move `Genre` to a lookup table, and `LyricModel` absorbs the change inside
+Rename a column or split one into its own table, and `LyricModel` absorbs the change inside
 its `Map`. No client breaks.
 
 ## Mapping
@@ -71,9 +71,10 @@ runtime surprises.
 Lyric bodies are large. Returning twenty of them in a list page wastes bandwidth nobody asked
 for, so lists pass `includeContent: false` and single reads pass `true`.
 
-`LyricModel.Content` is therefore `string?` — **null in a list response** — while the entity's
-`Content` is non-nullable. That asymmetry is intentional and worth knowing before you write a
-client against it.
+`LyricModel.Content` is therefore `string?` — **null in a list response**. The entity has no
+`Content` column at all: the text lives in its sections, and `Map` composes it with
+`Lyric.ComposeText()`. So a single read must load the sections (`Include(l => l.Sections)`), or
+it returns an empty string rather than failing.
 
 ## Filters and paging
 
