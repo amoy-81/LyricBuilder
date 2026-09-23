@@ -10,6 +10,12 @@ public class LyricBuilderDbContext(DbContextOptions<LyricBuilderDbContext> optio
 {
     public DbSet<Lyric> Lyrics => Set<Lyric>();
 
+    public DbSet<LyricSection> LyricSections => Set<LyricSection>();
+
+    public DbSet<Style> Styles => Set<Style>();
+
+    public DbSet<Tag> Tags => Set<Tag>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

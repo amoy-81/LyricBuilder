@@ -3,8 +3,9 @@ using System.ComponentModel.DataAnnotations;
 namespace LyricBuilder.Core.Models.Lyrics;
 
 /// <summary>
-/// Write model for creating or updating a lyric. Deliberately omits AuthorId and Status —
-/// those are server-owned, so a client cannot claim authorship or publish itself.
+/// Write model for creating or updating a lyric's header. Deliberately omits AuthorId, Kind and
+/// Status — those are server-owned, so a client cannot claim authorship, publish itself, or
+/// pass its lyric off as a reference example. Text lives in sections, not here.
 /// </summary>
 public class LyricMutation
 {
@@ -13,10 +14,10 @@ public class LyricMutation
     public string Title { get; init; } = string.Empty;
 
     [Required]
-    public string Content { get; init; } = string.Empty;
+    public Guid StyleId { get; init; }
 
-    [MaxLength(100)]
-    public string? Genre { get; init; }
+    [MaxLength(2000)]
+    public string? Concept { get; init; }
 
     [MaxLength(16)]
     public string? Language { get; init; }

@@ -5,8 +5,9 @@ namespace LyricBuilder.Core.Models.Lyrics;
 /// </summary>
 public class LyricFilter : WithPagination
 {
+    public LyricKind? Kind { get; set; }
     public LyricStatus? Status { get; set; }
-    public string? Genre { get; set; }
+    public Guid? StyleId { get; set; }
     public string? Language { get; set; }
 
     /// <summary>Case-insensitive match against the title.</summary>

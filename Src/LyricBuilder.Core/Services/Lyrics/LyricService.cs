@@ -19,6 +19,7 @@ public interface ILyricService
 public sealed class LyricService(
     ILogger<LyricService> logger,
     IRepository<Lyric> lyricRepository,
+    IRepository<Style> styleRepository,
     IUnitOfWork unitOfWork,
     RequestContext requestContext) : ILyricService
 {
@@ -28,11 +29,14 @@ public sealed class LyricService(
         {
             var query = lyricRepository.Query();
 
+            if (filter.Kind is not null)
+                query = query.Where(l => l.Kind == filter.Kind);
+
             if (filter.Status is not null)
                 query = query.Where(l => l.Status == filter.Status);
 
-            if (filter.Genre.IsNotNullOrEmpty())
-                query = query.Where(l => l.Genre == filter.Genre);
+            if (filter.StyleId is not null)
+                query = query.Where(l => l.StyleId == filter.StyleId);
 
             if (filter.Language.IsNotNullOrEmpty())
                 query = query.Where(l => l.Language == filter.Language);
@@ -62,7 +66,10 @@ public sealed class LyricService(
     {
         try
         {
-            var lyric = await lyricRepository.GetByIdAsync(id, ct);
+            // Content is composed from the sections, so they are loaded with the lyric.
+            var lyric = await lyricRepository.Query()
+                .Include(l => l.Sections)
+                .FirstOrDefaultAsync(l => l.Id == id, ct);
             if (lyric is null)
                 return StatefulResult<LyricModel>.Failed(InternalError.NotFound("lyric not found"));
 
@@ -83,14 +90,18 @@ public sealed class LyricService(
             if (requestContext.UserId is null)
                 return MutationOperationResult.Failed(InternalError.Unauthorized("no authenticated user"));
 
+            if (!await IsSelectableStyleAsync(mutation.StyleId, ct))
+                return MutationOperationResult.Failed(InternalError.BadRequest("style not found or inactive"));
+
             var lyric = new Lyric
             {
                 Title = mutation.Title,
-                Content = mutation.Content,
-                Genre = mutation.Genre,
+                StyleId = mutation.StyleId,
+                Concept = mutation.Concept,
                 Language = mutation.Language,
                 Bpm = mutation.Bpm,
                 AuthorId = requestContext.UserId.Value,
+                Kind = LyricKind.Original,
                 Status = LyricStatus.Draft
             };
 
@@ -119,9 +130,14 @@ public sealed class LyricService(
                 return MutationOperationResult.Failed(
                     InternalError.Forbidden("caller does not own this lyric", "you cannot edit this lyric"));
 
+            // Only a change of style is checked, so a style retired later does not lock its
+            // existing lyrics out of edits.
+            if (mutation.StyleId != lyric.StyleId && !await IsSelectableStyleAsync(mutation.StyleId, ct))
+                return MutationOperationResult.Failed(InternalError.BadRequest("style not found or inactive"));
+
             lyric.Title = mutation.Title;
-            lyric.Content = mutation.Content;
-            lyric.Genre = mutation.Genre;
+            lyric.StyleId = mutation.StyleId;
+            lyric.Concept = mutation.Concept;
             lyric.Language = mutation.Language;
             lyric.Bpm = mutation.Bpm;
 
@@ -162,4 +178,7 @@ public sealed class LyricService(
                 InternalError.InternalServerError("error while deleting lyric"));
         }
     }
+
+    private Task<bool> IsSelectableStyleAsync(Guid styleId, CancellationToken ct) =>
+        styleRepository.AnyAsync(s => s.Id == styleId && s.IsActive, ct);
 }
