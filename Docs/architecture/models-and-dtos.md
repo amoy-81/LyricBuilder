@@ -27,21 +27,22 @@ appear in the response — internal bookkeeping a client has no business seeing.
 
 ### 2. It would let clients write server-owned fields
 
-This is the important one. `LyricMutation` deliberately has **no `AuthorId` and no `Status`**.
+This is the important one. `LyricMutation` deliberately has **no `AuthorId` and no `Kind`**.
 
 If the entity were the request body, a client could post:
 
 ```json
-{ "title": "…", "content": "…", "authorId": "<someone-else>", "status": 2 }
+{ "title": "…", "styleId": "…", "authorId": "<someone-else>", "kind": 1 }
 ```
 
-…and forge authorship or publish itself. The attack is called **over-posting** (or mass
+…and forge authorship, or turn its own lyric into a reference example that generation
+learns from. The attack is called **over-posting** (or mass
 assignment), and the defence is that those fields do not exist on the type the model binder
 fills. The service sets them:
 
 ```csharp
 AuthorId = requestContext.UserId.Value,   // from the token, never the body
-Status = LyricStatus.Draft                // the server decides
+Kind = LyricKind.Original                 // the server decides
 ```
 
 **When adding a mutation type, start from what the client may set — not by copying the
@@ -93,7 +94,7 @@ Core enforces them before the action runs, thanks to `[ApiController]`.
 These are **shape** checks — length, presence, numeric range. They live on the model because
 they describe the contract.
 
-Business rules do not belong here. "A lyric can only be published once it has content" depends
+Business rules do not belong here. "A repeat must point at a section of the same lyric" depends
 on state the model cannot see; that belongs in the service or on the entity.
 
 Note the layering wrinkle: `DataAnnotations` is an API concern sitting in `Core`. It is

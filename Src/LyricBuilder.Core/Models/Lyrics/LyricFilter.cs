@@ -6,7 +6,6 @@ namespace LyricBuilder.Core.Models.Lyrics;
 public class LyricFilter : WithPagination
 {
     public LyricKind? Kind { get; set; }
-    public LyricStatus? Status { get; set; }
     public Guid? StyleId { get; set; }
     public string? Language { get; set; }
 

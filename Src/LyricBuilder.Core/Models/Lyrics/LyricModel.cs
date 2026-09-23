@@ -16,13 +16,11 @@ public class LyricModel
 
     public Guid AuthorId { get; init; }
     public LyricKind Kind { get; init; }
-    public LyricStatus Status { get; init; }
     public Guid StyleId { get; init; }
     public string? Concept { get; init; }
     public string? Language { get; init; }
     public int? Bpm { get; init; }
     public DateTime CreatedAt { get; init; }
-    public DateTime? PublishedAt { get; init; }
 
     /// <summary>
     /// Maps an entity to its read model. <paramref name="includeContent"/> keeps full lyric
@@ -35,12 +33,10 @@ public class LyricModel
         Content = includeContent ? lyric.ComposeText() : null,
         AuthorId = lyric.AuthorId,
         Kind = lyric.Kind,
-        Status = lyric.Status,
         StyleId = lyric.StyleId,
         Concept = lyric.Concept,
         Language = lyric.Language,
         Bpm = lyric.Bpm,
-        CreatedAt = lyric.CreatedAt,
-        PublishedAt = lyric.PublishedAt
+        CreatedAt = lyric.CreatedAt
     };
 }

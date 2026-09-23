@@ -32,9 +32,6 @@ public sealed class LyricService(
             if (filter.Kind is not null)
                 query = query.Where(l => l.Kind == filter.Kind);
 
-            if (filter.Status is not null)
-                query = query.Where(l => l.Status == filter.Status);
-
             if (filter.StyleId is not null)
                 query = query.Where(l => l.StyleId == filter.StyleId);
 
@@ -101,8 +98,7 @@ public sealed class LyricService(
                 Language = mutation.Language,
                 Bpm = mutation.Bpm,
                 AuthorId = requestContext.UserId.Value,
-                Kind = LyricKind.Original,
-                Status = LyricStatus.Draft
+                Kind = LyricKind.Original
             };
 
             await lyricRepository.AddAsync(lyric, ct);

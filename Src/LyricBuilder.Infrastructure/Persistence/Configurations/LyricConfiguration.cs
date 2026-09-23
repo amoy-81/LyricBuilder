@@ -28,9 +28,6 @@ public class LyricConfiguration : IEntityTypeConfiguration<Lyric>
         builder.Property(l => l.Kind)
             .HasConversion<int>();
 
-        builder.Property(l => l.Status)
-            .HasConversion<int>();
-
         // A style in use cannot be removed out from under its lyrics.
         builder.HasOne(l => l.Style)
             .WithMany()
@@ -55,7 +52,6 @@ public class LyricConfiguration : IEntityTypeConfiguration<Lyric>
             .UsePropertyAccessMode(PropertyAccessMode.Field);
 
         builder.HasIndex(l => l.AuthorId);
-        builder.HasIndex(l => l.Status);
 
         // The lookup generation runs to find examples: reference lyrics of a given style.
         builder.HasIndex(l => new { l.Kind, l.StyleId });

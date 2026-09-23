@@ -31,8 +31,7 @@ be swapped without touching a service.
 Entities and enums. `BaseEntity`, `Lyric`, `LyricStatus`.
 
 Currently anemic — data with no behaviour. That is a deliberate starting point, not a target.
-As business rules appear ("a lyric cannot be published without content"), they belong on the
-entity, not spread across services.
+As business rules appear, they belong on the entity, not spread across services.
 
 ### Infrastructure
 

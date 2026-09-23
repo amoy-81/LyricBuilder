@@ -112,7 +112,8 @@ Every feature has three model types, in `Core/Models/<Feature>/`:
 | `XFilter` | in | Query-string filter; extends `WithPagination`. |
 
 `XMutation` deliberately omits server-owned fields. `LyricMutation` has no `AuthorId` or
-`Status`, so a client cannot claim authorship or publish itself — the service sets both.
+`Kind`, so a client cannot claim authorship or pass its lyric off as a reference example — the
+service sets both.
 
 ### Services register themselves by name
 

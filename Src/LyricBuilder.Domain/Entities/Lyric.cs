@@ -28,8 +28,6 @@ public class Lyric : BaseEntity
 
     public LyricKind Kind { get; set; } = LyricKind.Original;
 
-    public LyricStatus Status { get; set; } = LyricStatus.Draft;
-
     public Guid StyleId { get; set; }
 
     public Style Style { get; set; } = null!;
@@ -51,8 +49,6 @@ public class Lyric : BaseEntity
 
     /// <summary>Performer of the original song. Reference lyrics only, for attribution.</summary>
     public string? OriginalArtist { get; set; }
-
-    public DateTime? PublishedAt { get; set; }
 
     /// <summary>Unordered; use <see cref="GetSectionsInOrder"/> for performance order.</summary>
     public IReadOnlyCollection<LyricSection> Sections => _sections;
