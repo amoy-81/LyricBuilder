@@ -1,6 +1,7 @@
 using LyricBuilder.Abstractions;
 using LyricBuilder.Abstractions.Domain;
 using LyricBuilder.Core;
+using LyricBuilder.Domain.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -50,6 +51,14 @@ public class BaseEndpoints(ILogger logger, RequestContext requestContext) : Cont
 /// <summary>Endpoints that require an authenticated caller.</summary>
 [Authorize]
 public class SecureEndpoint(ILogger logger, RequestContext requestContext)
+    : BaseEndpoints(logger, requestContext);
+
+/// <summary>
+/// Endpoints for admins only. Routed under <c>api/admin/…</c>, so admin endpoints never share a
+/// path with the writer-facing ones.
+/// </summary>
+[Authorize(Roles = nameof(AccountRole.Admin))]
+public class AdminEndpoint(ILogger logger, RequestContext requestContext)
     : BaseEndpoints(logger, requestContext);
 
 /// <summary>Endpoints open to anonymous callers.</summary>
