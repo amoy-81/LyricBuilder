@@ -28,7 +28,28 @@ public class LyricBuilderDbContext(DbContextOptions<LyricBuilderDbContext> optio
         // adding a config file — never editing this method.
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(LyricBuilderDbContext).Assembly);
 
+        MarkIdsAsClientAssigned(modelBuilder);
         ApplyUtcDateTimeConversion(modelBuilder);
+    }
+
+    /// <summary>
+    /// Tells EF Core that <see cref="BaseEntity.Id"/> is set by the entity itself, not generated
+    /// on insert.
+    /// </summary>
+    /// <remarks>
+    /// By convention EF Core treats a Guid key as generated on add, and so reads an entity whose
+    /// key is already set as one that exists in the database. A new child found through a
+    /// tracked navigation — a section added with <c>Lyric.AddSection</c> — would be saved with
+    /// an <c>UPDATE</c> that matches no row instead of an <c>INSERT</c>. With the key marked as
+    /// never generated, such an entity is inserted.
+    /// </remarks>
+    private static void MarkIdsAsClientAssigned(ModelBuilder modelBuilder)
+    {
+        foreach (var entityType in modelBuilder.Model.GetEntityTypes()
+                     .Where(t => typeof(BaseEntity).IsAssignableFrom(t.ClrType)))
+            modelBuilder.Entity(entityType.ClrType)
+                .Property(nameof(BaseEntity.Id))
+                .ValueGeneratedNever();
     }
 
     /// <summary>

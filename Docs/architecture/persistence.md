@@ -48,7 +48,7 @@ dozens of lines long is asking for a dedicated repository method.
 
 | Property | Set by |
 |---|---|
-| `Id` | `Guid.CreateVersion7()` at construction |
+| `Id` | `Guid.CreateVersion7()` at construction — never by EF Core or the database |
 | `CreatedAt` | `SaveChanges`, on insert |
 | `UpdatedAt` | `SaveChanges`, on update |
 | `IsDeleted`, `DeletedAt` | `Repository.Remove` |
@@ -62,6 +62,17 @@ entry.Property(e => e.CreatedAt).IsModified = false;
 
 Without that line, saving a detached entity whose `CreatedAt` was never loaded would overwrite
 the real creation time with a default.
+
+### Ids are client-assigned, and EF Core is told so
+
+`LyricBuilderDbContext` marks every `Id` as `ValueGeneratedNever`. Without that, EF Core's
+convention treats a Guid key as generated on insert, and so reads any entity whose key is
+already set as one that exists in the database. Every entity here has its key set from
+construction, so a new section added to a tracked lyric was saved as an `UPDATE` that matched
+no row, and failed with `DbUpdateConcurrencyException`.
+
+`Repository.Update` still marks everything it is given as modified, new or not. Do not call it
+on a tracked entity whose children were added; just save.
 
 ### Why Guid v7
 
