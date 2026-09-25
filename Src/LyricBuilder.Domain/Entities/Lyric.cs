@@ -23,8 +23,10 @@ public class Lyric : BaseEntity
 
     public string Title { get; set; } = string.Empty;
 
-    /// <summary>Owning writer. Not a navigation yet — the identity model is not in place.</summary>
+    /// <summary>Owning writer. For reference lyrics, the admin who curated it.</summary>
     public Guid AuthorId { get; set; }
+
+    public User Author { get; set; } = null!;
 
     public LyricKind Kind { get; set; } = LyricKind.Original;
 

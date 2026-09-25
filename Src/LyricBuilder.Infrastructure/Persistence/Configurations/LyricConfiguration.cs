@@ -34,6 +34,12 @@ public class LyricConfiguration : IEntityTypeConfiguration<Lyric>
             .HasForeignKey(l => l.StyleId)
             .OnDelete(DeleteBehavior.Restrict);
 
+        // A writer with lyrics cannot be hard-deleted out from under them; users soft-delete.
+        builder.HasOne(l => l.Author)
+            .WithMany(u => u.Lyrics)
+            .HasForeignKey(l => l.AuthorId)
+            .OnDelete(DeleteBehavior.Restrict);
+
         builder.HasMany(l => l.Tags)
             .WithMany(t => t.Lyrics)
             .UsingEntity(

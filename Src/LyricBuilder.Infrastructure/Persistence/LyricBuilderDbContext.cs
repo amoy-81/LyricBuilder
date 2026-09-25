@@ -16,6 +16,10 @@ public class LyricBuilderDbContext(DbContextOptions<LyricBuilderDbContext> optio
 
     public DbSet<Tag> Tags => Set<Tag>();
 
+    public DbSet<User> Users => Set<User>();
+
+    public DbSet<Account> Accounts => Set<Account>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
