@@ -15,5 +15,8 @@ public class Tag : BaseEntity
 
     public TagCategory Category { get; set; }
 
+    /// <summary>Inactive tags stay on existing lyrics but are hidden from writers.</summary>
+    public bool IsActive { get; set; } = true;
+
     public ICollection<Lyric> Lyrics { get; set; } = [];
 }
