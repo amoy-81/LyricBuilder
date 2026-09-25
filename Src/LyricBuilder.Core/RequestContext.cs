@@ -8,9 +8,14 @@ namespace LyricBuilder.Core;
 /// <remarks>Scoped — one instance per request.</remarks>
 public class RequestContext
 {
+    /// <summary>The caller's <see cref="User"/> id, the one lyrics are authored under.</summary>
     public Guid? UserId { get; set; }
 
     public string? UserName { get; set; }
 
+    public AccountRole? Role { get; set; }
+
     public bool IsAuthenticated => UserId is not null;
+
+    public bool IsAdmin => Role == AccountRole.Admin;
 }

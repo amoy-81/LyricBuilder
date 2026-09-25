@@ -5,6 +5,10 @@
     </ItemGroup>
 
     <ItemGroup>
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    </ItemGroup>
+
+    <ItemGroup>
         <ProjectReference Include="..\LyricBuilder.Abstractions\LyricBuilder.Abstractions.csproj" />
         <ProjectReference Include="..\LyricBuilder.Domain\LyricBuilder.Domain.csproj" />
         <ProjectReference Include="..\LyricBuilder.Infrastructure\LyricBuilder.Infrastructure.csproj" />

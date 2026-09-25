@@ -22,6 +22,7 @@
     </ItemGroup>
 
     <ItemGroup Label="Web / API">
+        <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
         <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.0" />
         <!-- Microsoft.AspNetCore.OpenApi pulls in Microsoft.OpenApi 2.0.0, which has a known
              high-severity advisory. Pinned forward within the same major so the document and

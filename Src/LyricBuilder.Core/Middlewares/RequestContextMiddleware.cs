@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using LyricBuilder.Core.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 
@@ -15,12 +16,13 @@ public class RequestContextMiddleware(RequestDelegate next)
 
         if (user.Identity?.IsAuthenticated == true)
         {
-            var subject = user.FindFirstValue(ClaimTypes.NameIdentifier) ?? user.FindFirstValue("sub");
-
-            if (Guid.TryParse(subject, out var userId))
+            if (Guid.TryParse(user.FindFirstValue(TokenClaims.Subject), out var userId))
                 requestContext.UserId = userId;
 
-            requestContext.UserName = user.FindFirstValue(ClaimTypes.Name);
+            requestContext.UserName = user.Identity.Name;
+
+            if (Enum.TryParse<AccountRole>(user.FindFirstValue(TokenClaims.Role), out var role))
+                requestContext.Role = role;
         }
 
         await next(context);

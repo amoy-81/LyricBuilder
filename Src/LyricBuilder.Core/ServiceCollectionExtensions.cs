@@ -1,5 +1,7 @@
 using LyricBuilder.Abstractions.Extensions;
+using LyricBuilder.Core.Authentication;
 using LyricBuilder.Infrastructure;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -14,10 +16,12 @@ public static class ServiceCollectionExtensions
     {
         services
             .AddLyricBuilderDatabase(configuration)
+            .AddJwtAuthentication(configuration)
             .AddScoped<RequestContext>()
             // Every class in this assembly named "…Service" is registered against its interfaces.
             // Types named outside that convention must be added explicitly below.
-            .RegisterByNamingConvention(typeof(RequestContext).Assembly, "Service");
+            .RegisterByNamingConvention(typeof(RequestContext).Assembly, "Service")
+            .AddSingleton<IPasswordHasher<Account>, PasswordHasher<Account>>();
 
         return services;
     }
