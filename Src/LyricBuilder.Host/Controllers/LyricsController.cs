@@ -6,15 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 namespace LyricBuilder.Host.Controllers;
 
 /// <summary>
-/// Lyrics authored on the platform.
+/// The caller's own lyrics. Every endpoint needs a signed-in caller and sees only what they wrote.
 /// </summary>
 [Route("api/lyrics")]
 public class LyricsController(
     ILogger<LyricsController> logger,
     RequestContext requestContext,
-    ILyricService lyricService) : PublicEndpoint(logger, requestContext)
+    ILyricService lyricService) : SecureEndpoint(logger, requestContext)
 {
-    /// <summary>Lyrics matching the filter (list — no lyric body).</summary>
+    /// <summary>The caller's lyrics matching the filter (list — no lyric body).</summary>
     [HttpGet]
     public async Task<IActionResult> GetLyrics([FromQuery] LyricFilter filter)
     {
@@ -22,7 +22,7 @@ public class LyricsController(
         return CreateResponse(result);
     }
 
-    /// <summary>One lyric by id, with its full content.</summary>
+    /// <summary>One of the caller's lyrics by id, with its full content.</summary>
     [HttpGet("{id:guid}")]
     public async Task<IActionResult> GetLyricById([FromRoute] Guid id)
     {
@@ -30,7 +30,7 @@ public class LyricsController(
         return CreateResponse(result);
     }
 
-    /// <summary>Creates a lyric owned by the caller, in draft status.</summary>
+    /// <summary>Creates a lyric owned by the caller.</summary>
     [HttpPost]
     public async Task<IActionResult> CreateLyric([FromBody] LyricMutation mutation)
     {

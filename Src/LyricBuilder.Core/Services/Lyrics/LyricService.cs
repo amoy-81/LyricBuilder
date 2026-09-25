@@ -27,7 +27,12 @@ public sealed class LyricService(
     {
         try
         {
-            var query = lyricRepository.Query();
+            if (requestContext.UserId is null)
+                return StatefulPagedResult<LyricModel>.Failed(InternalError.Unauthorized("no authenticated user"));
+
+            // Writers see only their own lyrics.
+            var query = lyricRepository.Query()
+                .Where(l => l.AuthorId == requestContext.UserId);
 
             if (filter.Kind is not null)
                 query = query.Where(l => l.Kind == filter.Kind);
@@ -63,10 +68,14 @@ public sealed class LyricService(
     {
         try
         {
+            if (requestContext.UserId is null)
+                return StatefulResult<LyricModel>.Failed(InternalError.Unauthorized("no authenticated user"));
+
+            // Someone else's lyric is reported as not found, so ids cannot be probed for existence.
             // Content is composed from the sections, so they are loaded with the lyric.
             var lyric = await lyricRepository.Query()
                 .Include(l => l.Sections)
-                .FirstOrDefaultAsync(l => l.Id == id, ct);
+                .FirstOrDefaultAsync(l => l.Id == id && l.AuthorId == requestContext.UserId, ct);
             if (lyric is null)
                 return StatefulResult<LyricModel>.Failed(InternalError.NotFound("lyric not found"));
 
@@ -119,12 +128,10 @@ public sealed class LyricService(
         try
         {
             var lyric = await lyricRepository.GetByIdAsync(id, ct);
-            if (lyric is null)
-                return MutationOperationResult.Failed(InternalError.NotFound("lyric not found"));
 
-            if (lyric.AuthorId != requestContext.UserId)
-                return MutationOperationResult.Failed(
-                    InternalError.Forbidden("caller does not own this lyric", "you cannot edit this lyric"));
+            // Someone else's lyric is reported as not found, the same as on reads.
+            if (lyric is null || lyric.AuthorId != requestContext.UserId)
+                return MutationOperationResult.Failed(InternalError.NotFound("lyric not found"));
 
             // Only a change of style is checked, so a style retired later does not lock its
             // existing lyrics out of edits.
@@ -155,12 +162,10 @@ public sealed class LyricService(
         try
         {
             var lyric = await lyricRepository.GetByIdAsync(id, ct);
-            if (lyric is null)
-                return MutationOperationResult.Failed(InternalError.NotFound("lyric not found"));
 
-            if (lyric.AuthorId != requestContext.UserId)
-                return MutationOperationResult.Failed(
-                    InternalError.Forbidden("caller does not own this lyric", "you cannot delete this lyric"));
+            // Someone else's lyric is reported as not found, the same as on reads.
+            if (lyric is null || lyric.AuthorId != requestContext.UserId)
+                return MutationOperationResult.Failed(InternalError.NotFound("lyric not found"));
 
             lyricRepository.Remove(lyric);
             await unitOfWork.SaveChangesAsync(ct);
