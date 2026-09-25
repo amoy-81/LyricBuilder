@@ -16,6 +16,7 @@ here by hand would.
 |---|---|
 | [Overview](architecture/overview.md) | The layers, which way dependencies point, and why |
 | [Domain model](architecture/domain-model.md) | Lyrics, sections, styles and tags, and how generation will use them |
+| [Authentication](architecture/authentication.md) | Accounts and users, roles, and what the JWT carries |
 | [Result pattern](architecture/result-pattern.md) | Why failures are return values instead of exceptions |
 | [Models and DTOs](architecture/models-and-dtos.md) | The three model types per feature, and the attack they prevent |
 | [Persistence](architecture/persistence.md) | Repository, unit of work, auditing, soft-delete, the UTC rule |

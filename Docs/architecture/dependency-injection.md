@@ -92,8 +92,8 @@ AuthorId = requestContext.UserId.Value
 **Ordering matters.** `UseRequestContext()` must come after `UseAuthentication()`, or the
 principal will not be populated yet and `UserId` will always be null.
 
-> Right now it is *always* null regardless, because no authentication scheme is registered.
-> See the root README's known gaps.
+`UserId` is the token's `sub` claim — the caller's `User` id, which is what `AuthorId` holds.
+See [authentication](authentication.md).
 
 ## Pipeline order
 

@@ -28,7 +28,8 @@ be swapped without touching a service.
 
 ### Domain
 
-Entities and enums: `Lyric` and its `LyricSection`s, `Style`, `Tag`. See
+Entities and enums: `Lyric` and its `LyricSection`s, `Style`, `Tag`, and the `User` who
+authors them with the `Account` they sign in with. See
 [Domain model](domain-model.md) for how they fit together.
 
 Mostly plain data. Where a real rule exists it lives on the entity, not in a service: section
@@ -96,6 +97,7 @@ always hold a single file.
 ## Further reading
 
 - [Domain model](domain-model.md) — lyrics, sections, styles, and what generation reads
+- [Authentication](authentication.md) — accounts, users, roles, and the token
 - [Result pattern](result-pattern.md) — how failures travel
 - [Models and DTOs](models-and-dtos.md) — why entities stop at the service boundary
 - [Persistence](persistence.md) — repository, auditing, the UTC rule

@@ -4,9 +4,11 @@ The entities are shaped around one future requirement: **generating a lyric one 
 time, from examples an admin has curated.** Most decisions below follow from it.
 
 ```
-Style ◄──── Lyric ────► Tag            (many-to-many, via LyricTags)
-  ▲           │
-  └ parent    └──► LyricSection  (ordered; a section may repeat another)
+Account ──► User ◄──── Lyric ────► Tag            (many-to-many, via LyricTags)
+                         │  │
+            Style ◄──────┘  └──► LyricSection  (ordered; a section may repeat another)
+              ▲
+              └ parent
 ```
 
 ## Lyric
@@ -16,6 +18,7 @@ A lyric is a header plus an ordered list of sections. It has **no text column of
 
 | Field | Why it exists |
 |---|---|
+| `AuthorId` | The `User` who wrote it — for reference lyrics, the admin who curated it |
 | `StyleId` | Required. The main key for finding examples |
 | `Tags` | Moods and themes that narrow the match within a style |
 | `Concept` | What the song is about. Context for every section's generation, so the idea holds across sections written days apart |
@@ -43,6 +46,14 @@ and `IX_LyricSections_Type` exist for this query.
 
 `Kind` is server-owned and absent from `LyricMutation`. A writer cannot turn their own lyric
 into training material.
+
+## User and Account
+
+`User` is the author's profile; `Account` holds the credentials and role for it. They are
+separate so credentials never travel with a profile. See [authentication](authentication.md).
+
+A user with lyrics cannot be hard-deleted: `Lyric.Author` is restricted on delete. Users
+soft-delete like everything else.
 
 ## Style and Tag
 
@@ -103,4 +114,3 @@ learns from its own unreviewed output drifts.
   accepted. That would be a `SectionDraft` child of `LyricSection` when it is needed.
 - **Line-level structure.** `Content` is one string. Syllable counts or per-line rhyme would
   need a `Line` entity.
-- **Authors as entities.** `AuthorId` is still a bare Guid.

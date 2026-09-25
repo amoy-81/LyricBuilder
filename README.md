@@ -2,9 +2,8 @@
 
 A lyric authoring platform for music, built on .NET 10 with a Clean Architecture layout.
 
-> **Status: early scaffolding.** The architecture, persistence, and one sample feature
-> (`Lyric`) are in place. Authentication is not wired up yet — see
-> [Known gaps](#known-gaps) before building on this.
+> **Status: early scaffolding.** The architecture, persistence, JWT authentication, and one
+> sample feature (`Lyric`) are in place. See [Known gaps](#known-gaps) before building on this.
 
 ## Table of contents
 
@@ -43,6 +42,10 @@ dotnet run --project Src/LyricBuilder.Host
 
 Then open **`/scalar/v1`** for interactive API docs, or `/openapi/v1.json` for the raw
 document. `/live` is the health check.
+
+Every lyrics endpoint needs a caller, and each caller sees only their own lyrics. Register at `POST /api/auth/register`, log in at `POST /api/auth/login`, and
+send the returned `accessToken` as `Authorization: Bearer <token>`. See
+[authentication](Docs/architecture/authentication.md).
 
 > No migration exists yet — run `dotnet ef migrations add Initial -p Src/LyricBuilder.Infrastructure -s Src/LyricBuilder.Host`
 > once before step 2.
@@ -185,21 +188,21 @@ dotnet ef database update      -p Src/LyricBuilder.Infrastructure -s Src/LyricBu
 | Key | Purpose |
 |---|---|
 | `ConnectionStrings:LyricBuilderDatabase` | PostgreSQL connection. Required — startup throws without it. |
+| `Jwt:Issuer`, `Jwt:Audience`, `Jwt:SigningKey` | Token signing and validation. Required — startup throws without them, or with a key under 32 bytes. |
+| `Jwt:AccessTokenLifetimeMinutes` | How long a token lasts. Defaults to 60. |
 | `Serilog` | Logging, split across `Serilog.json` and `Serilog.<Environment>.json`. |
 
-`appsettings.Development.json` ships with a placeholder password. Prefer `user-secrets` for
-real credentials — that file is not gitignored.
+`appsettings.Development.json` ships with a placeholder password and a development signing
+key. Prefer `user-secrets` for real credentials — that file is not gitignored.
 
 ## Known gaps
 
 Deliberately unfinished, in rough priority order:
 
-1. **Authentication.** The pipeline calls `UseAuthentication`, but no scheme is registered.
-   `[Authorize]` on `SecureEndpoint` will not work until a JWT scheme is added, and
-   `RequestContext.UserId` is always `null` — so **create and update currently fail with
-   `Unauthorized`**. `LyricsController` extends `PublicEndpoint` so reads remain testable
-   in the meantime.
-2. **No migration.** The schema has never been generated.
-3. **No tests.** No test project exists yet.
+1. **No migration.** The schema has never been generated.
+2. **No tests.** No test project exists yet.
+3. **Tokens cannot be revoked**, and there are no refresh tokens. A role or password change
+   takes effect only when the old token expires. There is also no endpoint to make an admin —
+   see [authentication](Docs/architecture/authentication.md#roles).
 4. **Validation** lives in `LyricMutation` as data annotations. Once rules grow beyond simple
    shape checks, move them into the service or adopt FluentValidation.

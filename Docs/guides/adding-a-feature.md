@@ -289,8 +289,10 @@ Every action is the same three lines: call the service, pass the result to `Crea
 return. **A controller that inspects `IsSuccess` itself means logic ended up in the wrong
 layer.**
 
-Extend `SecureEndpoint` instead of `PublicEndpoint` to require authentication — though until
-a JWT scheme is registered, that will reject every request.
+Extend `SecureEndpoint` instead of `PublicEndpoint` to require a token for the whole
+controller, as `LyricsController` does, or put `[Authorize]` on single actions.
+`[Authorize(Roles = nameof(AccountRole.Admin))]` limits an action to admins. See
+[authentication](../architecture/authentication.md).
 
 XML comments become the descriptions in `/scalar/v1`.
 

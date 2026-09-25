@@ -127,10 +127,11 @@ Nothing is listening on the host and port. PostgreSQL is not running, or the por
 Should not happen — the UTC converter handles it. If it does, a `DateTime` is being written
 through a path that bypasses the model. See [persistence](../architecture/persistence.md).
 
-## Current limitations
+**`InvalidOperationException: Jwt:SigningKey must be at least 32 bytes`**
+Thrown at startup outside Development, where no key is committed. Set one:
+`dotnet user-secrets set "Jwt:SigningKey" "<32+ random characters>"`, or the `Jwt__SigningKey`
+environment variable.
 
-**Create and update do not work yet.** No authentication scheme is registered, so
-`RequestContext.UserId` is always null and both operations return `Unauthorized`. Reads work.
-
-`LyricsController` extends `PublicEndpoint` specifically so the read paths stay testable until
-JWT is wired up.
+**`401` from any `/api/lyrics` endpoint**
+Every lyrics endpoint needs a token, reads included. Register, log in at `POST /api/auth/login`, and send the `accessToken` as
+`Authorization: Bearer <token>`. In `/scalar/v1`, paste it into the auth section once.
