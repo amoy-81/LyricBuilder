@@ -2,9 +2,12 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using LyricBuilder.Core;
 using LyricBuilder.Core.Middlewares;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
 using Serilog;
+
+const string bearerScheme = "Bearer";
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +58,33 @@ builder.Services.AddOpenApi(options =>
         document.Info.Title = "LyricBuilder API";
         document.Info.Version = "1.0.0";
         document.Info.Description = "Lyric authoring platform API";
+
+        document.Components ??= new OpenApiComponents();
+        document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
+        document.Components.SecuritySchemes[bearerScheme] = new OpenApiSecurityScheme
+        {
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            Description = "The accessToken returned by POST /api/auth/login."
+        };
+        return Task.CompletedTask;
+    });
+
+    // Only operations that actually require a caller advertise the scheme, so the docs show
+    // which endpoints need a token.
+    options.AddOperationTransformer((operation, context, _) =>
+    {
+        var metadata = context.Description.ActionDescriptor.EndpointMetadata;
+        if (metadata.OfType<IAuthorizeData>().Any() && !metadata.OfType<IAllowAnonymous>().Any())
+        {
+            operation.Security ??= [];
+            operation.Security.Add(new OpenApiSecurityRequirement
+            {
+                [new OpenApiSecuritySchemeReference(bearerScheme, context.Document)] = []
+            });
+        }
+
         return Task.CompletedTask;
     });
 });
@@ -70,7 +100,8 @@ app.MapScalarApiReference(options =>
     options
         .WithTitle("LyricBuilder API")
         .WithTheme(ScalarTheme.BluePlanet)
-        .WithDefaultHttpClient(ScalarTarget.Shell, ScalarClient.Curl);
+        .WithDefaultHttpClient(ScalarTarget.Shell, ScalarClient.Curl)
+        .AddPreferredSecuritySchemes(bearerScheme);
 });
 
 app.UseErrorMiddleware();
