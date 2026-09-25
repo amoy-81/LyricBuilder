@@ -50,11 +50,10 @@ UPDATE "Accounts" SET "Role" = 1 WHERE "Username" = 'someone';
 The role is baked into the token, so the account has to **log in again** before the change
 takes effect.
 
-To restrict an endpoint to admins:
-
-```csharp
-[Authorize(Roles = nameof(AccountRole.Admin))]
-```
+Admin endpoints live in their own controllers, named `Admin…Controller`, routed under
+`api/admin/…` and derived from `AdminEndpoint`. That base carries
+`[Authorize(Roles = nameof(AccountRole.Admin))]`, so every action is covered without
+repeating the attribute. Writer-facing endpoints never share a controller with admin ones.
 
 Inside a service, `requestContext.IsAdmin` answers the same question.
 

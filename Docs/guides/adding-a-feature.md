@@ -291,7 +291,8 @@ layer.**
 
 Extend `SecureEndpoint` instead of `PublicEndpoint` to require a token for the whole
 controller, as `LyricsController` does, or put `[Authorize]` on single actions.
-`[Authorize(Roles = nameof(AccountRole.Admin))]` limits an action to admins. See
+Admin endpoints go in a separate `Admin…Controller` that extends `AdminEndpoint` and is routed
+under `api/admin/…`, as `AdminStylesController` is. See
 [authentication](../architecture/authentication.md).
 
 XML comments become the descriptions in `/scalar/v1`.

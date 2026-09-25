@@ -68,6 +68,33 @@ Two kinds of descriptor, because they answer different questions:
 Both have a `Slug`, which is unique among non-deleted rows. Prompts and clients refer to the
 slug because it does not change when a name is reworded.
 
+### Managing the catalogue
+
+Writers and admins use separate endpoints:
+
+| | Writers (read-only) | Admins (read and write) |
+|---|---|---|
+| Styles | `/api/styles` — `StyleService` | `/api/admin/styles` — `AdminStyleService` |
+| Tags | `/api/tags` — `TagService` | `/api/admin/tags` — `AdminTagService` |
+
+Each endpoint returns the same thing whoever calls it. An admin calling `/api/styles` gets the
+writer's view. The admin check sits on the controller (`AdminEndpoint`) and again in the admin
+services.
+
+- **Slugs are fixed at creation.** An update must send the same slug; a different one is
+  rejected rather than silently ignored.
+- **Retire a style, don't delete it.** A style that lyrics use, or that has sub-styles, cannot
+  be deleted (`409`). Set `IsActive = false` instead. Existing lyrics keep it, and writers can
+  no longer pick it for new ones.
+- **Writers see less.** They list active styles and tags only. `WritingGuidelines` is null for
+  them, because it is written for the model and not for people. An inactive tag reads as not
+  found for a writer, even by id. An inactive style can still be read by id, because a
+  writer's existing lyric may be in it.
+- **No cycles.** A style cannot be nested under itself or under one of its own sub-styles, so
+  the fallback from sub-style to parent always ends.
+- **Deleting a tag** soft-deletes it. Its `LyricTags` rows stay, but the query filter hides
+  the tag, so it drops off every lyric that carried it.
+
 ## LyricSection
 
 The unit that gets written or generated at a time.
