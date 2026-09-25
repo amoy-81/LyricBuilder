@@ -43,8 +43,8 @@ public sealed class LyricService(
             if (filter.Language.IsNotNullOrEmpty())
                 query = query.Where(l => l.Language == filter.Language);
 
-            if (filter.Search.IsNotNullOrEmpty())
-                query = query.Where(l => l.Title.Contains(filter.Search));
+            if (filter.Title.IsNotNullOrEmpty())
+                query = query.Where(l => l.Title.Contains(filter.Title));
 
             var total = await query.LongCountAsync(ct);
             var lyrics = await query

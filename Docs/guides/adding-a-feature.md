@@ -85,7 +85,7 @@ namespace LyricBuilder.Core.Models.Albums;
 public class AlbumFilter : WithPagination
 {
     public Guid? ArtistId { get; set; }
-    public string? Search { get; set; }
+    public string? Title { get; set; }
 }
 ```
 
@@ -125,8 +125,8 @@ public sealed class AlbumService(
             if (filter.ArtistId is not null)
                 query = query.Where(a => a.ArtistId == filter.ArtistId);
 
-            if (filter.Search.IsNotNullOrEmpty())
-                query = query.Where(a => a.Title.Contains(filter.Search));
+            if (filter.Title.IsNotNullOrEmpty())
+                query = query.Where(a => a.Title.Contains(filter.Title));
 
             var total = await query.LongCountAsync(ct);
             var albums = await query

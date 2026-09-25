@@ -10,5 +10,5 @@ public class LyricFilter : WithPagination
     public string? Language { get; set; }
 
     /// <summary>Case-insensitive match against the title.</summary>
-    public string? Search { get; set; }
+    public string? Title { get; set; }
 }
