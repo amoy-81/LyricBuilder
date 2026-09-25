@@ -1,3 +1,4 @@
+using LyricBuilder.Abstractions.Domain.Exceptions;
 using LyricBuilder.Domain.Enums;
 
 namespace LyricBuilder.Domain.Entities;
@@ -42,4 +43,23 @@ public class LyricSection : BaseEntity
     public Guid? RepeatsSectionId { get; internal set; }
 
     public bool IsRepeat => RepeatsSectionId is not null;
+
+    /// <summary>
+    /// Replaces the text as written by a person. Generated text that a person changes becomes
+    /// <see cref="ContentOrigin.AiEdited"/>, so it is not later mistaken for raw model output.
+    /// </summary>
+    public void EditContent(string content)
+    {
+        if (IsRepeat)
+            throw LyricBuilderException.BadRequest(
+                $"section {Id} is a repeat of {RepeatsSectionId}",
+                "a repeated section takes its text from the original; edit that instead");
+
+        if (content == Content)
+            return;
+
+        Content = content;
+        if (Origin == ContentOrigin.AiGenerated)
+            Origin = ContentOrigin.AiEdited;
+    }
 }

@@ -22,6 +22,17 @@ public class LyricBuilderException : Exception
         FriendlyMessage = string.IsNullOrWhiteSpace(friendlyMessage) ? message : friendlyMessage;
     }
 
+    /// <summary>
+    /// For a service that calls an entity's rule and has to return the violation as a result
+    /// rather than let it escape to the error middleware.
+    /// </summary>
+    public InternalError ToInternalError() => new()
+    {
+        InternalErrorCode = InternalErrorCode,
+        Message = Message,
+        FriendlyMessage = FriendlyMessage
+    };
+
     public static LyricBuilderException NotFound(string message, string? friendlyMessage = null) =>
         new(message, InternalErrorCode.NotFound, friendlyMessage);
 

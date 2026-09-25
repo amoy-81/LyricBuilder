@@ -108,6 +108,10 @@ its repeats too.
 Record `Origin` honestly. When examples are selected, prefer `Human` sections: a model that
 learns from its own unreviewed output drifts.
 
+Write a person's text through `LyricSection.EditContent`, not the `Content` setter. It turns
+`AiGenerated` into `AiEdited` when the text changes, and it refuses to write text onto a
+repeat. `Origin` is absent from `LyricSectionMutation`, so a client cannot set it.
+
 ## Not modelled yet
 
 - **Generation history.** Candidate texts per section, the prompt used, which one the writer

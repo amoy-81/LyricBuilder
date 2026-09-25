@@ -69,6 +69,8 @@ public class Repository<TEntity>(LyricBuilderDbContext dbContext) : IRepository<
 
     public IQueryable<TEntity> Query() => _set.AsNoTracking();
 
+    public IQueryable<TEntity> QueryTracked() => _set;
+
     private IQueryable<TEntity> Filtered(Expression<Func<TEntity, bool>>? predicate) =>
         predicate is null ? _set : _set.Where(predicate);
 }

@@ -40,4 +40,10 @@ public interface IRepository<TEntity> where TEntity : class
 
     /// <summary>Composable query for reads a method signature cannot express. Read-only (no tracking).</summary>
     IQueryable<TEntity> Query();
+
+    /// <summary>
+    /// Tracked counterpart of <see cref="Query"/>, for loading an entity together with its
+    /// children before changing them — changes to anything it returns are saved.
+    /// </summary>
+    IQueryable<TEntity> QueryTracked();
 }

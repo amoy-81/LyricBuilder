@@ -37,6 +37,20 @@ accidentally persist a mutation.
 `GetByIdAsync` and `FirstOrDefaultAsync` **do** track, because they are the entry point for
 updates: load, mutate, save.
 
+`QueryTracked()` is the tracked counterpart of `Query()`, for when an update needs an entity
+**together with its children**. Changing a lyric's sections is the case it exists for:
+`Lyric`'s section methods work on the loaded collection, so the lyric has to be loaded with
+`Include(l => l.Sections)` and tracked, then saved without calling `Update`:
+
+```csharp
+var lyric = await lyricRepository.QueryTracked()
+    .Include(l => l.Sections)
+    .FirstOrDefaultAsync(l => l.Id == lyricId, ct);
+
+lyric.AddSection(SectionType.Chorus);
+await unitOfWork.SaveChangesAsync(ct);   // the change tracker finds the new section
+```
+
 `Query()` returns `IQueryable<T>` for reads a method signature cannot express. It composes
 server-side, so filtering and paging still happen in the database. The cost is that EF Core
 leaks into the service — acceptable for queries, but a service building a `Query()` chain
