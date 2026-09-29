@@ -22,13 +22,21 @@ builder.Host.UseSerilog(
 
 builder.Services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
 
+// Enums travel as their names, both ways. Numbers are refused, so a request cannot depend on
+// the order of an enum's members.
+var enumsAsNames = new JsonStringEnumConverter(allowIntegerValues: false);
+
 builder.Services
     .AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        options.JsonSerializerOptions.Converters.Add(enumsAsNames);
     });
+
+// The OpenAPI document is generated from these options, not the MVC ones above. Without the
+// converter here too, it describes every enum as an integer.
+builder.Services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(enumsAsNames));
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -37,22 +45,6 @@ builder.Services.AddCore(builder.Configuration);
 
 builder.Services.AddOpenApi(options =>
 {
-    // Enums serialize as strings (see JsonStringEnumConverter above); the schema has to agree.
-    options.AddSchemaTransformer((schema, context, _) =>
-    {
-        var type = context.JsonTypeInfo.Type;
-        if (type.IsEnum)
-        {
-            schema.Type = JsonSchemaType.String;
-            schema.Format = null;
-            schema.Enum = Enum.GetNames(type)
-                .Select(name => (System.Text.Json.Nodes.JsonNode)System.Text.Json.Nodes.JsonValue.Create(name))
-                .ToList();
-        }
-
-        return Task.CompletedTask;
-    });
-
     options.AddDocumentTransformer((document, _, _) =>
     {
         document.Info.Title = "LyricBuilder API";
