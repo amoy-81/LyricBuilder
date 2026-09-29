@@ -50,10 +50,7 @@ public class LyricSection : BaseEntity
     /// </summary>
     public void EditContent(string content)
     {
-        if (IsRepeat)
-            throw LyricBuilderException.BadRequest(
-                $"section {Id} is a repeat of {RepeatsSectionId}",
-                "a repeated section takes its text from the original; edit that instead");
+        EnsureNotRepeat();
 
         if (content == Content)
             return;
@@ -61,5 +58,29 @@ public class LyricSection : BaseEntity
         Content = content;
         if (Origin == ContentOrigin.AiGenerated)
             Origin = ContentOrigin.AiEdited;
+    }
+
+    /// <summary>
+    /// Replaces the text with model output. It is <see cref="ContentOrigin.AiGenerated"/> even
+    /// when the model only polished a person's draft, so it is never picked as a human example.
+    /// </summary>
+    public void ApplyGeneratedContent(string content)
+    {
+        EnsureNotRepeat();
+
+        Content = content;
+        Origin = ContentOrigin.AiGenerated;
+    }
+
+    /// <summary>
+    /// Throws when this section is a repeat, which has no text of its own to write. Public so
+    /// that callers doing expensive work toward a write can fail before it.
+    /// </summary>
+    public void EnsureNotRepeat()
+    {
+        if (IsRepeat)
+            throw LyricBuilderException.BadRequest(
+                $"section {Id} is a repeat of {RepeatsSectionId}",
+                "a repeated section takes its text from the original; edit that instead");
     }
 }
