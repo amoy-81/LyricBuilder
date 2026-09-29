@@ -12,7 +12,8 @@ namespace LyricBuilder.Host.Controllers;
 public class LyricSectionsController(
     ILogger<LyricSectionsController> logger,
     RequestContext requestContext,
-    ILyricSectionService sectionService) : SecureEndpoint(logger, requestContext)
+    ILyricSectionService sectionService,
+    ISectionWritingService writingService) : SecureEndpoint(logger, requestContext)
 {
     /// <summary>The lyric's sections in performance order.</summary>
     [HttpGet]
@@ -38,6 +39,21 @@ public class LyricSectionsController(
         [FromBody] LyricSectionMutation mutation)
     {
         var result = await sectionService.UpdateSectionAsync(lyricId, sectionId, mutation, RequestCancellationToken);
+        return CreateResponse(result);
+    }
+
+    /// <summary>
+    /// Writes the section with AI, from reference examples in the lyric's style and language.
+    /// An empty section is written from scratch; a written one is revised by the instruction,
+    /// or polished and completed without one. The new text is saved and returned.
+    /// </summary>
+    [HttpPut("{sectionId:guid}/ai")]
+    public async Task<IActionResult> EditWithAi(
+        [FromRoute] Guid lyricId,
+        [FromRoute] Guid sectionId,
+        [FromBody] SectionAiEditMutation mutation)
+    {
+        var result = await writingService.EditWithAiAsync(lyricId, sectionId, mutation, RequestCancellationToken);
         return CreateResponse(result);
     }
 
