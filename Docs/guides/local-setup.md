@@ -64,6 +64,29 @@ dotnet user-secrets set "ConnectionStrings:LyricBuilderDatabase" \
 The key is required. Startup throws `InvalidOperationException` if it is missing or blank —
 by design, so a misconfigured app fails immediately rather than at the first query.
 
+### The AI API key (optional)
+
+Writing sections with AI goes through the OpenAI SDK. Out of the box it points at Groq, which
+serves an OpenAI-compatible API. Put the key in user-secrets too:
+
+```bash
+dotnet user-secrets set "OpenAI:ApiKey" "<your-groq-key>" --project Src/LyricBuilder.Host
+```
+
+Unlike the connection string, this key is optional. The app starts without it, and only
+`PUT …/sections/{id}/ai` fails, with a 500 that says AI writing is not available.
+
+The `OpenAI` section in `appsettings.json` chooses the provider:
+
+| Key | Meaning |
+|---|---|
+| `Endpoint` | Base URL of an OpenAI-compatible API. Remove it to use OpenAI itself |
+| `Model` | A chat model that endpoint serves |
+| `Temperature` | How freely the model writes. Lower stays closer to the examples |
+
+To move from Groq to OpenAI, remove `Endpoint`, set `Model` to an OpenAI model, and replace
+the key.
+
 ## 3. The schema
 
 **No migration exists yet.** Generate it once:

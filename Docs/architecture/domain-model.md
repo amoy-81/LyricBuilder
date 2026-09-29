@@ -139,9 +139,50 @@ Write a person's text through `LyricSection.EditContent`, not the `Content` sett
 `AiGenerated` into `AiEdited` when the text changes, and it refuses to write text onto a
 repeat. `Origin` is absent from `LyricSectionMutation`, so a client cannot set it.
 
+## Writing a section with AI
+
+`PUT /api/lyrics/{lyricId}/sections/{sectionId}/ai` writes one section with the
+model and saves it. `SectionWritingService` does the work, and the prompt is in
+`SectionPrompt`. The request carries only an optional instruction. What the model is asked to
+do follows from the section:
+
+| Section | Instruction | The model… |
+|---|---|---|
+| Empty | any | writes it from scratch |
+| Has text | given | reworks the text as the instruction says |
+| Has text | none | polishes and completes the text |
+
+### Examples, not temperature, set the quality
+
+The model is shown up to four reference sections, chosen like this:
+
+- They are the **same type** as the target section, from `Reference` lyrics in the **same
+  style**. If the lyric has a language, they are in that language too.
+- They are **human-written only** (`Origin = Human`).
+- They are **ranked by shared tags**. Ties go to the lower id, so the same lyric gets the same
+  examples every time.
+- They are **spread across songs**. The model gets one section per song first, then the best
+  of the rest.
+- If the lyric's style has too few, the **parent style** makes up the shortfall. Its examples
+  come after the lyric's own style's, however many tags they share.
+
+The prompt also carries the style's `WritingGuidelines` (or the nearest ancestor's), the
+lyric's concept, moods and themes, the section's brief and rhyme scheme, and the rest of the
+song in order. With that context the section fits between its neighbours.
+
+**The catalogue is what makes this work.** A style with no reference sections of a type still
+gets output, but only from the guidelines. Curate references before judging the model.
+
+### The result is always `AiGenerated`
+
+`LyricSection.ApplyGeneratedContent` marks the text `AiGenerated`, even when the model only
+polished a person's draft. When the writer edits it afterwards, it becomes `AiEdited`. Either
+way it is never picked as an example. A repeat is refused before the model is called.
+
 ## Not modelled yet
 
 - **Generation history.** Candidate texts per section, the prompt used, which one the writer
-  accepted. That would be a `SectionDraft` child of `LyricSection` when it is needed.
+  accepted. That would be a `SectionDraft` child of `LyricSection` when it is needed. Until
+  then, writing with AI overwrites the section's text and there is no undo on the server.
 - **Line-level structure.** `Content` is one string. Syllable counts or per-line rhyme would
   need a `Line` entity.
