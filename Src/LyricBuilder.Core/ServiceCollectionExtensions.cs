@@ -1,4 +1,5 @@
 using LyricBuilder.Abstractions.Extensions;
+using LyricBuilder.Core.Ai;
 using LyricBuilder.Core.Authentication;
 using LyricBuilder.Infrastructure;
 using Microsoft.AspNetCore.Identity;
@@ -17,6 +18,7 @@ public static class ServiceCollectionExtensions
         services
             .AddLyricBuilderDatabase(configuration)
             .AddJwtAuthentication(configuration)
+            .AddOpenAiChat(configuration)
             .AddScoped<RequestContext>()
             // Every class in this assembly named "…Service" is registered against its interfaces.
             // Types named outside that convention must be added explicitly below.
