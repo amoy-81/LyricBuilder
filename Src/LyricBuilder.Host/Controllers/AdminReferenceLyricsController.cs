@@ -6,7 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace LyricBuilder.Host.Controllers;
 
 /// <summary>
-/// Maintains the reference lyrics that AI section writing takes its examples from. Admins only.
+/// Maintains the reference lyrics that AI section writing takes its examples from. Admins only;
+/// their sections are maintained through <see cref="AdminReferenceSectionsController"/>.
 /// </summary>
 [Route("api/admin/reference-lyrics")]
 public class AdminReferenceLyricsController(
