@@ -82,6 +82,14 @@ builder.Services.AddOpenApi(options =>
     });
 });
 
+// Browser clients allowed to call the API. Tokens travel in the Authorization header, not
+// cookies, so credentials are not allowed.
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+builder.Services.AddCors(options => options.AddDefaultPolicy(policy => policy
+    .WithOrigins(allowedOrigins)
+    .AllowAnyHeader()
+    .AllowAnyMethod()));
+
 builder.Services.AddMemoryCache();
 builder.Services.AddHealthChecks();
 
@@ -102,6 +110,9 @@ app.MapScalarApiReference(options =>
 });
 
 app.UseErrorMiddleware();
+
+// Before the HTTPS redirect, so a preflight is answered instead of redirected.
+app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();

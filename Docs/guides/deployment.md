@@ -25,6 +25,7 @@ Set these on the container, never in the image:
 | `ConnectionStrings__LyricBuilderDatabase` | yes, or the previous one | Npgsql key-value form. Wins over `DATABASE_URL` when both are set |
 | `Jwt__SigningKey` | yes | 32+ random characters. Startup fails without it outside Development |
 | `OpenAI__ApiKey` | no | Without it, only AI section writing fails |
+| `Cors__AllowedOrigins__0`, `__1`, … | no | Browser origins allowed to call the API. Each index overrides the default at that position (`0` is `http://localhost:3480`, `1` is `http://localhost:3481`) |
 
 Changing `Jwt__SigningKey` signs everyone out — existing tokens stop validating.
 
