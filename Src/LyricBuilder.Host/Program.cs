@@ -2,6 +2,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using LyricBuilder.Core;
 using LyricBuilder.Core.Middlewares;
+using LyricBuilder.Infrastructure;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.OpenApi;
 using Scalar.AspNetCore;
@@ -85,6 +86,10 @@ builder.Services.AddMemoryCache();
 builder.Services.AddHealthChecks();
 
 var app = builder.Build();
+
+// Off by default, so local runs keep using dotnet-ef. The Docker image turns it on.
+if (app.Configuration.GetValue<bool>("Database:MigrateOnStartup"))
+    await app.Services.MigrateLyricBuilderDatabaseAsync();
 
 app.MapOpenApi();
 app.MapScalarApiReference(options =>

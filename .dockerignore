@@ -1,0 +1,14 @@
+**/bin/
+**/obj/
+**/.vs/
+**/.idea/
+**/*.user
+**/appsettings.Local.json
+**/appsettings.*.Local.json
+**/*.local.json
+.git/
+.gitignore
+Docs/
+README.md
+Dockerfile
+.dockerignore

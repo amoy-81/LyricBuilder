@@ -28,6 +28,7 @@ here by hand would.
 |---|---|
 | [Local setup](guides/local-setup.md) | Getting a working database and a running app |
 | [Adding a feature](guides/adding-a-feature.md) | The full walkthrough, one file at a time |
+| [Deployment](guides/deployment.md) | The Docker image, its configuration, and SnapDeploy |
 
 ## Keeping these honest
 

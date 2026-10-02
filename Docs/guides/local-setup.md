@@ -140,7 +140,7 @@ The app reached PostgreSQL and the credentials are wrong. Re-check step 2. Note 
 **`500`, log shows `relation "Lyrics" does not exist`**
 The database exists but the schema was never applied. Step 3.
 
-**`InvalidOperationException: ConnectionStrings:LyricBuilderDatabase is not configured`**
+**`InvalidOperationException: ConnectionStrings:LyricBuilderDatabase is not configured, and neither is DATABASE_URL`**
 Thrown at startup. The key is missing or empty.
 
 **The request hangs, then fails**
