@@ -47,6 +47,28 @@ and `IX_LyricSections_Type` exist for this query.
 `Kind` is server-owned and absent from `LyricMutation`. A writer cannot turn their own lyric
 into training material.
 
+### Curating references
+
+Admins maintain references through their own endpoints:
+
+| | Endpoint | Service |
+|---|---|---|
+| Reference lyrics | `/api/admin/reference-lyrics` | `AdminReferenceLyricService` |
+| Their sections | `/api/admin/reference-lyrics/{lyricId}/sections` | `AdminReferenceSectionService` |
+
+- **References only.** These endpoints see `Kind = Reference` lyrics and nothing else. A
+  writer's lyric reads as not found, even by id. Any admin can maintain any reference, not
+  only the ones they curated. `AuthorId` records who created it.
+- **Language is required.** Examples are matched by language, so a reference without one
+  would never be picked.
+- **Any style and tag that exists.** Retired styles and inactive tags are allowed. Writers'
+  existing lyrics may still be in them, and those lyrics still need examples.
+- **Tags are a set.** An update replaces the reference's tags with the ones sent.
+- **Section text is `Human`.** It is written through `EditContent`, like a writer's. These
+  endpoints have no AI writing, so a reference never holds model output.
+- **Deleting a reference** soft-deletes it. Its sections stay in the table, but the lyric's
+  query filter hides them, so they stop being used as examples.
+
 ## User and Account
 
 `User` is the author's profile; `Account` holds the credentials and role for it. They are
